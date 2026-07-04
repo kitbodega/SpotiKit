@@ -1,24 +1,26 @@
 # Spotifuck Web
 
-A simple JavaScript userscript that customizes the Spotify Web interface.
+A JavaScript userscript that customizes the Spotify Web interface.
 
 ## Features
 
 - Remove visible ads
-- Hide Premium plans
-- Block Premium promotion pages
-- Disable payment pages
-- Disable payment methods
+- Hide Premium promotions
 - Hide Premium upgrade buttons
-- Block Premium redirects
-- Fake Premium status (visual only)
+- Hide Premium plans
+- Block Premium pages
+- Block payment pages
+- Block payment methods
+- Visual Premium interface
+- Visual Premium status
 - Replace Free plan with Premium (visual only)
+
 ## Notes
 
-- Client-side JavaScript injection only.
-- Does **not** modify Spotify servers.
-- Does **not** change your Spotify account.
-- Interface customization only.
+- Client-side JavaScript only.
+- No Spotify servers are modified.
+- No account data is changed.
+- Visual customization only.
 
 ## License
 
