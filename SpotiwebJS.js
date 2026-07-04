@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      7.0
 // @description  Spotifuck Web — visual mods + AdBlocker for Spotify
-// @author       Plancy + Asistente
+// @author       kit_fogos
 // @match        https://www.spotify.com/*/account/*
 // @match        https://open.spotify.com/*
 // @match        https://www.spotify.com/*/premium/*
