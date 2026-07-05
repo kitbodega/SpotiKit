@@ -1,4 +1,4 @@
-# Spotifuck Web
+# SpotiKit
 
 A JavaScript userscript that customizes the Spotify Web interface.
 
