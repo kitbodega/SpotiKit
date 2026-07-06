@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         SpotiKit
+// @name         SpotiKit++ desktop
 // @namespace    http://tampermonkey.net/
 // @version      7.0
 // @description  SpotiKIt — visual premium + AdBlocker for Spotify
