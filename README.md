@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/29723797/README.md)
 # SpotiKit
 
 A JavaScript userscript that customizes the Spotify Web interface.
