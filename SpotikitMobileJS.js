@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Spotikit++
+// @name         Spotikit++ MOBILE
 // @namespace    http://tampermonkey.net/
 // @version      7.0
 // @description  Spotikit + adblock + premium spoof + unlock web mobile player likes
