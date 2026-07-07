@@ -6,17 +6,6 @@ A JavaScript userscript that customizes the Spotify Web interface.
 
 ### Desktop (`open.spotify.com`)
 - Ad blocking (ads, banners, download prompts)
-- AMOLED pure black mode (`--background-base: #000`)
-- Library sidebar toggle (expand/collapse with fullscreen overlay)
-- Close now-playing panel
-- Auto-close library on playlist/item selection (preserves folder clicks)# SpotiKit
-
-A JavaScript userscript that customizes the Spotify Web interface.
-
-## Features
-
-### Desktop (`open.spotify.com`)
-- Ad blocking (ads, banners, download prompts)
 - Hide Premium pages and payment pages
 
 ### Mobile web player (`open.spotify.com` in responsive view on PC)
