@@ -300,7 +300,7 @@ div[data-testid=root]>div:first-child>div:first-child{
   padding-left:0!important
 }
 div[data-testid=root]{--panel-gap:0!important}
-[data-tippy-root]{display:none!important;pointer-events:none!important}
+
 section[data-testid=artist-page]>div>div:first-child:not([data-encore-id]){height:25vh}
 div[data-testid=tracklist-row]{padding:0 10px 0 0;grid-gap:0}
 div[data-testid=tracklist-row] button:not([data-testid=add-to-playlist-button]){transform:scale(1.3)!important;opacity:0.6!important}
@@ -431,10 +431,6 @@ section[data-testid=artist-page] div[data-testid=grid-container] h2,section[data
             document.body.classList.toggle('sp-collection', isCollection);
         }
 
-        function dismissTippy() {
-            document.querySelectorAll('[data-tippy-root]').forEach(el => el.remove());
-        }
-
         injectMobileCSS();
 
         const waitForBody = setInterval(() => {
@@ -443,7 +439,6 @@ section[data-testid=artist-page] div[data-testid=grid-container] h2,section[data
                 updateHomeVisibility();
                 createBottomNav();
                 firstFuck();
-                setInterval(dismissTippy, 300);
                 setInterval(() => {
                     updateActiveTab();
                     updateHomeVisibility();
