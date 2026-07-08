@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotiKit++ desktop
 // @namespace    https://github.com/kitbodega/SpotiKit
-// @version      7.0.fork
+// @version      7.1.fork
 // @description  SpotiKit — visual premium UI overlay for Spotify and ad banner blocking
 // @author       kit_fogos
 // @match        https://www.spotify.com/*/account/*
@@ -12,6 +12,7 @@
 // @match        https://www.spotify.com/*/family/*
 // @match        https://payments.spotify.com/*
 // @grant        GM_addStyle
+// @grant        GM_registerMenuCommand
 // @run-at       document-idle
 // @homepageURL  https://github.com/Myst1cX/SpotiKit
 // @supportURL   https://github.com/Myst1cX/SpotiKit/issues
@@ -22,6 +23,20 @@
 // RESOLVED (7.0.fork, Myst1cX):
 // Added proper linking for installing the script via an userscript manager 
 // Removed obsolete function that attempted to intercept and block audio ads. 
+//
+// RESOLVED (7.1.fork):
+// Text-replacement pass is now scoped to changed nodes instead of walking
+// the whole document on every mutation, and also catches in-place text
+// updates (characterData), not just added/removed nodes.
+// Removed the redundant setInterval ad-cleanup now that the MutationObserver
+// covers the same ground on its own.
+// Every swap the script makes is now recorded (selector, before/after text,
+// times applied) and can be printed as a table from the userscript-manager
+// menu.
+// Added "already done" guards to every hide-only action (upgrade button,
+// install link, premium menu link, Planes Premium/Premium Plans sweeps,
+// compact-banner rebuild, and the Try/Prueba button) so each is only
+// touched and logged once per element instead of re-firing on every tick.
 
 (function() {
     'use strict';
@@ -60,23 +75,51 @@
         "Free plan": "Premium Individual",
     };
 
+    const replacementLog = new Map();
+
+    function logChange(selector, from, to) {
+        const key = `${selector}\u0000${from}\u0000${to}`;
+        const existing = replacementLog.get(key);
+        if (existing) {
+            existing.times_applied++;
+        } else {
+            replacementLog.set(key, { selector, old_text: from, new_text: to, times_applied: 1 });
+        }
+    }
+
+    function printReplacementLog() {
+        if (replacementLog.size === 0) {
+            console.log('[SpotiKit] Nothing has been replaced yet.');
+            return;
+        }
+        console.log(`[SpotiKit] ${replacementLog.size} distinct change(s) made so far:`);
+        console.table(Array.from(replacementLog.values()));
+    }
+
+    function applyReplacements(node) {
+        let v = node.nodeValue;
+        if (v == null) return;
+        let c = false;
+        for (const [from, to] of Object.entries(REPLACE)) {
+            if (v.includes(from)) {
+                v = v.replaceAll(from, to);
+                c = true;
+                logChange('(page text)', from, to);
+            }
+        }
+        if (c) node.nodeValue = v;
+    }
+
+    function scanText(root) {
+        if (!root) return;
+        const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+        let n;
+        while (n = w.nextNode()) applyReplacements(n);
+    }
+
     function run() {
         const b = document.body;
         if (!b) return;
-
-        const w = document.createTreeWalker(b, NodeFilter.SHOW_TEXT, null, false);
-        let n;
-        while (n = w.nextNode()) {
-            let v = n.nodeValue;
-            let c = false;
-            for (const [from, to] of Object.entries(REPLACE)) {
-                if (v.includes(from)) {
-                    v = v.replaceAll(from, to);
-                    c = true;
-                }
-            }
-            if (c) n.nodeValue = v;
-        }
 
         document.querySelectorAll('.encore-text-title-medium, [class*="title-medium"]').forEach(el => {
             if ((el.textContent || '').trim() === 'Premium Individual') {
@@ -108,6 +151,7 @@
         document.querySelectorAll('h1, h2, h3, h4, strong, span, div[class*="plan"], div[class*="Plan"]').forEach(el => {
             const t = (el.textContent || '').trim();
             if (t === 'Free' || t === 'Spotify Free' || t === 'Free plan') {
+                logChange('h1,h2,h3,h4,strong,span,div[class*="plan"]', t, 'Premium Individual');
                 el.textContent = 'Premium Individual';
                 el.style.color = PINK;
                 el.style.fontWeight = '700';
@@ -115,22 +159,30 @@
         });
 
         document.querySelectorAll('a, button, [role="button"]').forEach(el => {
-            const t = (el.innerText || el.textContent || '').trim().toLowerCase();
+            const orig = (el.innerText || el.textContent || '').trim();
+            const t = orig.toLowerCase();
             if (/^(get|buy|join|obtener|conseguir)\s*premium/.test(t)) {
+                logChange('a, button, [role="button"]', orig, 'DONT JOIN PREMIUM');
                 el.textContent = 'DONT JOIN PREMIUM';
                 el.style.cssText += `background:${PINK}!important;color:#000!important;border:none!important;border-radius:20px!important;font-weight:700!important;pointer-events:none!important;cursor:default!important;`;
                 el.onclick = e => { e.preventDefault(); e.stopPropagation(); };
             }
             if (/^(explore|view|explorar|ver)\s*(plans|planes)/.test(t)) {
+                logChange('a, button, [role="button"]', orig, 'Manage plan');
                 el.textContent = 'Manage plan';
                 el.style.cssText += `background:transparent!important;color:#fff!important;border:1px solid #727272!important;border-radius:20px!important;font-weight:700!important;pointer-events:none!important;cursor:default!important;`;
                 el.onclick = e => { e.preventDefault(); e.stopPropagation(); };
             }
-            if (/^(try|pru[eé]ba)/.test(t)) el.style.display = 'none';
+            if (/^(try|pru[eé]ba)/.test(t) && !el.dataset.spDone) {
+                logChange('a, button, [role="button"]', orig, '(hidden)');
+                el.style.display = 'none';
+                el.dataset.spDone = '1';
+            }
         });
 
         document.querySelectorAll('[class*="badge"], [class*="Badge"]').forEach(el => {
             if (/^free$/i.test(el.textContent.trim())) {
+                logChange('[class*="badge"]', el.textContent.trim(), 'PREMIUM');
                 el.textContent = 'PREMIUM';
                 el.style.background = PINK;
                 el.style.color = '#000';
@@ -141,6 +193,7 @@
             tbl.querySelectorAll('td, th').forEach(cell => {
                 const t = cell.textContent.trim().toLowerCase();
                 if (!t || t === '—' || t === '-' || t === 'no' || /gratuito|free/.test(t)) {
+                    logChange('table td, th', t || '(empty)', '✓');
                     cell.innerHTML = `<span style="color:${GREEN};font-weight:700;">✓</span>`;
                 }
             });
@@ -149,16 +202,17 @@
         document.querySelectorAll('span[data-encore-id="text"]').forEach(el => {
             const t = el.textContent.trim();
             if (t === 'Download for offline listening' || t === 'Descarga canciones para disfrutarlas sin conexi\u00f3n' || t === 'Descarga canciones para disfrutarlas sin conexión') {
+                logChange('span[data-encore-id="text"]', t, 'Spotify wont fuck you');
                 el.textContent = 'Spotify wont fuck you';
             }
         });
 
-        const upgradeBtn = document.querySelector('[data-testid="upgrade-button"]');
-        if (upgradeBtn) upgradeBtn.style.display = 'none';
-        const installBtn = document.querySelector('a[href="/download"]');
-        if (installBtn) installBtn.style.display = 'none';
-        const premiumMenu = document.querySelector('a[href*="premium/?ref=web_loggedin_upgrade_menu"]');
-        if (premiumMenu) premiumMenu.style.display = 'none';
+        const upgradeBtn = document.querySelector('[data-testid="upgrade-button"]:not([data-sp-done])');
+        if (upgradeBtn) { logChange('[data-testid="upgrade-button"]', upgradeBtn.textContent.trim(), '(hidden)'); upgradeBtn.style.display = 'none'; upgradeBtn.dataset.spDone = '1'; }
+        const installBtn = document.querySelector('a[href="/download"]:not([data-sp-done])');
+        if (installBtn) { logChange('a[href="/download"]', 'install app link', '(hidden)'); installBtn.style.display = 'none'; installBtn.dataset.spDone = '1'; }
+        const premiumMenu = document.querySelector('a[href*="premium/?ref=web_loggedin_upgrade_menu"]:not([data-sp-done])');
+        if (premiumMenu) { logChange('a[href*="premium/?ref=web_loggedin_upgrade_menu"]', premiumMenu.textContent.trim(), '(hidden)'); premiumMenu.style.display = 'none'; premiumMenu.dataset.spDone = '1'; }
 
         const planesXpath = document.evaluate(
             '//a[text()="Planes Premium"] | //span[text()="Planes Premium"] | //div[text()="Planes Premium"] | //a[text()="Premium Plans"] | //span[text()="Premium Plans"] | //div[text()="Premium Plans"]',
@@ -166,16 +220,27 @@
         );
         for (let i = 0; i < planesXpath.snapshotLength; i++) {
             const n = planesXpath.snapshotItem(i);
-            if (n) n.style.display = 'none';
+            if (n && n.nodeType === 1 && !n.dataset.spDone) {
+                logChange('(xpath) Planes Premium / Premium Plans text', n.textContent.trim(), '(hidden)');
+                n.style.display = 'none';
+                n.dataset.spDone = '1';
+            }
         }
 
         document.querySelectorAll('[aria-label*="Planes Premium"], [aria-label*="Premium Plans"], [data-ga-action="premium"], [data-ga-category="menu"] a, a[href*="/premium/"]').forEach(el => {
+            if (el.dataset.spDone) return;
             const t = el.textContent.trim();
-            if (t === 'Planes Premium' || t === 'Premium Plans') el.style.display = 'none';
+            if (t === 'Planes Premium' || t === 'Premium Plans') {
+                logChange('[aria-label*="Premium Plans"] / [data-ga-action="premium"] / a[href*="/premium/"]', t, '(hidden)');
+                el.style.display = 'none';
+                el.dataset.spDone = '1';
+            }
         });
 
-        const premiumBanner = document.querySelector('[data-testid="compact-banner"]');
+        const premiumBanner = document.querySelector('[data-testid="compact-banner"]:not([data-sp-done])');
         if (premiumBanner) {
+            logChange('[data-testid="compact-banner"]', '(original upgrade banner)', 'Edit profile / Payment method buttons');
+            premiumBanner.dataset.spDone = '1';
             const wrapper = premiumBanner.closest('.sc-dad329a7-0, [class*="dad329a7"]');
             if (wrapper) {
                 wrapper.style.width = '100%';
@@ -214,7 +279,7 @@
                 window.location.href = 'https://www.spotify.com/mx/account/profile/';
             };
 
-
+            
             const right = document.createElement('div');
             right.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;row-gap:var(--encore-spacing-tighter-2);padding:var(--encore-spacing-looser) var(--encore-spacing-tighter-2);cursor:pointer;border-left:1px solid #404040;';
             const cardSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -241,6 +306,7 @@
         }
 
         if (/\/premium\/|\/duo\/|\/student\/|\/family\//.test(window.location.href) && !document.querySelector('.__sp_premium_done')) {
+            logChange('main / #__next (plan purchase page)', '(original plan page content)', '"You dont need Premium" overlay');
             const main = document.querySelector('main') || document.getElementById('__next') || document.body;
             const wrapper = document.createElement('div');
             wrapper.className = '__sp_premium_done';
@@ -254,6 +320,7 @@
         }
 
         if (window.location.hostname === 'payments.spotify.com' && !document.querySelector('.__sp_pay_done')) {
+            logChange('main / #root (payments page)', '(original checkout page content)', '"DONT WASTE YOUR MONEY" overlay');
             const main = document.querySelector('main') || document.getElementById('root') || document.body;
             const wrapper = document.createElement('div');
             wrapper.className = '__sp_pay_done';
@@ -271,14 +338,56 @@
         }
     }
 
-    setTimeout(run, 300);
-    setTimeout(run, 1200);
+    setTimeout(() => { scanText(document.body); run(); }, 300);
+    setTimeout(() => { scanText(document.body); run(); }, 1200);
 
     let timer;
-    new MutationObserver(() => {
+    let pendingNodes = new Set();
+    let pendingTextNodes = new Set();
+    let mainObserver = null;
+
+    function handleMutations(mutations) {
+        for (const m of mutations) {
+            if (m.type === 'childList') {
+                m.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) pendingNodes.add(node);
+                });
+            } else if (m.type === 'characterData') {
+                pendingTextNodes.add(m.target);
+            }
+        }
         clearTimeout(timer);
-        timer = setTimeout(run, 400);
-    }).observe(document.body, { childList: true, subtree: true });
+        timer = setTimeout(() => {
+            if (pendingNodes.size > 0 && pendingNodes.size <= 20) {
+                pendingNodes.forEach(node => scanText(node));
+            } else if (pendingNodes.size > 20) {
+                scanText(document.body);
+            }
+            pendingNodes.clear();
+            pendingTextNodes.forEach(node => applyReplacements(node));
+            pendingTextNodes.clear();
+            run();
+        }, 400);
+    }
+
+    function startObserver() {
+        if (mainObserver) mainObserver.disconnect();
+        mainObserver = new MutationObserver(handleMutations);
+        mainObserver.observe(document.body, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+        });
+    }
+
+    startObserver();
+
+    if (typeof GM_registerMenuCommand === 'function') {
+        GM_registerMenuCommand('📋 Show everything replaced so far (console)', () => {
+            printReplacementLog();
+            alert('Current text replacements have been logged to the console. Open DevTools (Press F12 or Right click and Inspect), then select the Logs tab under Console to view it.');
+        });
+    }
 })();
 
 
@@ -299,13 +408,7 @@
         subtree: true,
     });
 
-    const adRemovalInterval = setInterval(() => {
-        removeElements('[data-testid="ad-slot-container"], [class*="ad-"]');
-        removeElements('.ButtonInner-sc-14ud5tc-0.fcsOIN');
-    }, 1000);
-
     window.addEventListener('beforeunload', () => {
         observer.disconnect();
-        clearInterval(adRemovalInterval);
     });
 })();
