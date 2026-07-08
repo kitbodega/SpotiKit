@@ -680,122 +680,48 @@ section[data-testid=artist-page] div[data-testid=grid-container] h2,section[data
         }
 
         if (/\/premium\/|\/duo\/|\/student\/|\/family\//.test(window.location.href) && !document.querySelector('.__sp_premium_done')) {
-            const main = document.querySelector('main') || document.getElementById('__next') || document.body;
-            const wrapper = document.createElement('div');
-            wrapper.className = '__sp_premium_done';
-            wrapper.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:40px;background:#121212;color:#fff;';
-            wrapper.innerHTML = `
-                <h1 style="font-size:32px;font-weight:700;margin-bottom:16px;color:#fff;">You dont need Spotify Premium. Trust me.</h1>
-                <a href="https://www.spotify.com/" style="display:inline-block;padding:14px 40px;background:#1ed760;color:#000;border-radius:20px;font-weight:700;font-size:16px;text-decoration:none;cursor:pointer;">Back to home</a>
-            `;
-            main.innerHTML = '';
-            main.appendChild(wrapper);
+            window.location.replace('https://open.spotify.com/');
         }
 
         if (window.location.hostname === 'payments.spotify.com' && !document.querySelector('.__sp_pay_done')) {
-            const main = document.querySelector('main') || document.getElementById('root') || document.body;
-            const wrapper = document.createElement('div');
-            wrapper.className = '__sp_pay_done';
-            wrapper.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:40px;background:#121212;color:#fff;';
-            wrapper.innerHTML = `
-                <h1 style="font-size:36px;font-weight:700;margin-bottom:16px;color:#fff;">DONT WASTE YOUR MONEY ON SPOTIFY</h1>
-                <p style="font-size:18px;margin-bottom:24px;color:#b3b3b3;">Dont give them a cent. Use Spotifuck for free.</p>
-                <a href="https://open.spotify.com/" style="display:inline-block;padding:14px 40px;background:#1ed760;color:#000;border-radius:20px;font-weight:700;font-size:16px;text-decoration:none;cursor:pointer;">Back to free Spotify</a>
-            `;
-            main.innerHTML = '';
-            main.appendChild(wrapper);
-            document.querySelectorAll('form, button[type="submit"], [data-testid*="pay"], [data-testid*="checkout"]').forEach(el => {
-                el.onclick = e => { e.preventDefault(); e.stopPropagation(); };
-            });
+            window.location.replace('https://open.spotify.com/');
         }
     }
 
     setTimeout(run, 300);
-    setTimeout(run, 1200);
+    setTimeout(run, 2000);
 
-    let timer;
-    new MutationObserver(() => {
-        clearTimeout(timer);
-        timer = setTimeout(run, 400);
-    }).observe(document.body, { childList: true, subtree: true });
+    (function() {
+        const adSelectors = [
+            '[data-testid="ad-slot-container"]',
+            '[data-testid="ad-container"]',
+            '[data-testid="ad-slot"]',
+            '[class*="AdSlot"]',
+            '[class*="adunit"]',
+            '[class*="ad-container"]',
+            '[id*="ad-"]',
+            '[aria-label="Ad"]',
+            '[aria-label="Advertisement"]',
+        ];
 
-    (async function() {
-        'use strict';
-
-        const removeElements = selector => {
-            document.querySelectorAll(selector).forEach(el => el.remove());
-        };
-
-        const handleAudioAds = () => {
-            const audioAd = document.querySelector('audio[src*="spotify.com/ad"]');
+        const removeAds = () => {
+            adSelectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => el.remove());
+            });
+            const audioAd = document.querySelector('audio[src*="spotify.com/ad"], audio[src*="ad"]');
             if (audioAd) {
-                audioAd.src = "";
                 audioAd.pause();
+                audioAd.src = '';
+                audioAd.remove();
             }
+            document.querySelectorAll('video').forEach(v => {
+                if (v.src.includes('ad') || v.src.includes('spotify')) v.pause();
+            });
         };
 
-        const inject = ({ ctx, fn, transform }) => {
-            const original = ctx[fn];
-            ctx[fn] = function () {
-                const result = original.apply(this, arguments);
-                return transform ? transform.call(this, result, ...arguments) : result;
-            };
-        };
-
-        const observer = new MutationObserver(() => {
-            removeElements('[data-testid="ad-slot-container"], [class*="ad-"]');
-            handleAudioAds();
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-        });
-
-        const adRemovalInterval = setInterval(() => {
-            removeElements('[data-testid="ad-slot-container"], [class*="ad-"]');
-            handleAudioAds();
-        }, 1000);
-
-        const queryAsync = (query, interval = 250) => new Promise(resolve => {
-            const checkInterval = setInterval(() => {
-                const element = document.querySelector(query);
-                if (element) {
-                    clearInterval(checkInterval);
-                    resolve(element);
-                }
-            }, interval);
-        });
-
-        const nowPlayingBar = await queryAsync(".now-playing-bar");
-        const playButton = await queryAsync("button[title=Play], button[title=Pause]");
-        let audio;
-
-        inject({
-            ctx: document,
-            fn: "createElement",
-            transform(result, type) {
-                if (type === "audio") {
-                    audio = result;
-                }
-                return result;
-            },
-        });
-
-        new MutationObserver(() => {
-            if (audio && playButton && document.querySelector(".now-playing > a")) {
-                audio.src = "";
-                playButton.click();
-            }
-        }).observe(nowPlayingBar, {
-            childList: true,
-            subtree: true,
-        });
-
-        window.addEventListener('beforeunload', () => {
-            observer.disconnect();
-            clearInterval(adRemovalInterval);
-        });
+        removeAds();
+        setInterval(removeAds, 2000);
+        new MutationObserver(removeAds).observe(document.body, { childList: true, subtree: true });
     })();
 
 })();
