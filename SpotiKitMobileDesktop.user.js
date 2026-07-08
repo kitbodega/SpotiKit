@@ -921,7 +921,7 @@ ul.oPf3qKGRkUM3T0bK{
             left.appendChild(leftText);
             left.onclick = e => {
                 e.stopPropagation();
-                window.location.href = 'https://www.spotify.com/mx/account/profile/';
+                window.location.href = 'https://www.spotify.com/*/account/profile/';
             };
 
             const right = document.createElement('div');
@@ -940,7 +940,7 @@ ul.oPf3qKGRkUM3T0bK{
             right.appendChild(rightText);
             right.onclick = e => {
                 e.stopPropagation();
-                window.location.href = 'https://www.spotify.com/mx/account/saved-payment-cards/';
+                window.location.href = 'https://www.spotify.com/*/account/saved-payment-cards/*';
             };
 
             premiumBanner.innerHTML = '';
@@ -960,43 +960,5 @@ ul.oPf3qKGRkUM3T0bK{
     setTimeout(run, 300);
     setTimeout(run, 2000);
 
-    // Ad blocking — adapted from Spotify AdBlocker by Plancy
-    const removeAdElements = () => {
-        document.querySelectorAll('[data-testid="ad-slot-container"], [class*="ad-"]').forEach(el => el.remove());
-        const audioAd = document.querySelector('audio[src*="spotify.com/ad"]');
-        if (audioAd) {
-            audioAd.src = "";
-            audioAd.pause();
-        }
-    };
-
-    const adObserver = new MutationObserver(removeAdElements);
-    adObserver.observe(document.body, { childList: true, subtree: true });
-    setInterval(removeAdElements, 1000);
-
-    // Skip ads via player state
-    setInterval(() => {
-        let isAd = false;
-
-        try {
-            const state = window.sp?.player?._state || window.Spotify?.Player?._state;
-            const track = state?.track || state?.item;
-            if (track && track.id === "Spotify-Advertisement") {
-                isAd = true;
-            }
-        } catch (e) {}
-
-        if (!isAd) {
-            const artistEl = document.querySelector('[data-testid="context-item-info-artist"]');
-            if (artistEl && artistEl.textContent.trim() === 'Advertisement') {
-                isAd = true;
-            }
-        }
-
-        if (isAd) {
-            const nextBtn = document.querySelector('button[data-testid="control-button-skip-forward"]');
-            if (nextBtn) nextBtn.click();
-        }
-    }, 500);
 
 })();
