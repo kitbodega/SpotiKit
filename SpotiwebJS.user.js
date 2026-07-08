@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotiKit++ desktop
 // @namespace    https://github.com/kitbodega/SpotiKit
-// @version      7.2.fork
+// @version      7.0.fork
 // @description  SpotiKit — visual premium UI overlay for Spotify and ad banner blocking
 // @author       kit_fogos
 // @match        https://www.spotify.com/*/account/*
@@ -21,10 +21,12 @@
 // ==/UserScript==
 
 // RESOLVED (7.0.fork, Myst1cX):
+
+// First change:
 // Added proper linking for installing the script via an userscript manager 
 // Removed obsolete function that attempted to intercept and block audio ads. 
 
-// RESOLVED (7.1.fork, Myst1cX):
+// Second big change:
 // Text-replacement pass is now scoped to changed nodes instead of walking
 // the whole document on every mutation, and also catches in-place text
 // updates (characterData), not just added/removed nodes.
@@ -38,7 +40,7 @@
 // compact-banner rebuild, and the Try/Prueba button) so each is only
 // touched and logged once per element instead of re-firing on every tick.
 
-// RESOLVED (7.2.fork, Myst1cX):
+// Third change: 
 // Added forceEnglish(), which overrides navigator.language/languages to
 // en-US and, on www.spotify.com, redirects non-English-region locale paths
 // (e.g. /mx/, /es/) to /us/ so the page itself loads in English instead of
