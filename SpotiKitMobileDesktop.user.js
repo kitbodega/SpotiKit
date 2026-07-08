@@ -940,7 +940,7 @@ ul.oPf3qKGRkUM3T0bK{
             right.appendChild(rightText);
             right.onclick = e => {
                 e.stopPropagation();
-                window.location.href = 'https://www.spotify.com/us/account/saved-payment-cards/*';
+                window.location.href = 'https://www.spotify.com/us/account/saved-payment-cards/';
             };
 
             premiumBanner.innerHTML = '';
