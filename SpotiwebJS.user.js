@@ -23,8 +23,8 @@
 // RESOLVED (7.0.fork, Myst1cX):
 // Added proper linking for installing the script via an userscript manager 
 // Removed obsolete function that attempted to intercept and block audio ads. 
-//
-// RESOLVED (7.1.fork):
+
+// RESOLVED (7.1.fork, Myst1cX):
 // Text-replacement pass is now scoped to changed nodes instead of walking
 // the whole document on every mutation, and also catches in-place text
 // updates (characterData), not just added/removed nodes.
