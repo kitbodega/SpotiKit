@@ -4,6 +4,7 @@
 // @version      7.3
 // @description  SpotiKit — Mobile‑like layout for Spotify Web. Floating player, bottom nav, library overlay, and more.
 // @author       kitbodega
+// @icon         https://i.ibb.co/YF1nLPfK/2eca7229-ca6a-4ad6-8653-b80a6a0f8586.png
 // @match        https://open.spotify.com/*
 // @match        https://www.spotify.com/*/account/*
 // @match        https://www.spotify.com/*/premium/*
@@ -12,11 +13,11 @@
 // @match        https://www.spotify.com/*/family/*
 // @match        https://payments.spotify.com/*
 // @grant        GM_addStyle
-// @run-at       document-idle
-// @downloadURL https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.js
-// @updateURL   https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.js
-// @supportURL  https://github.com/kitbodega/SpotiKit/issues
-// @icon        https://i.ibb.co/YF1nLPfK/2eca7229-ca6a-4ad6-8653-b80a6a0f8586.png
+// @run-at       document-start
+// @homepageURL  https://github.com/kitbodega/SpotiKit
+// @supportURL   https://github.com/kitbodega/SpotiKit/issues
+// @updateURL    https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.js
+// @downloadURL  https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.js
 // ==/UserScript==
 
 (function() {
