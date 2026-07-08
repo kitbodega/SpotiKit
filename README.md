@@ -31,10 +31,6 @@ A JavaScript userscript that customizes the Spotify Web interface.
 - Disable payment forms and checkout buttons
 - Hide download/install app prompts, "Open in Desktop App" elements, and Premium navigation links
 
-## Credits
-
-Ad blocking adapted from [Spotifuck](https://github.com/Myst1cX/spotifuck-userscript) by Myst1cX.
-
 ## Notes
 
 - Client-side JavaScript only. No Spotify servers are modified.
