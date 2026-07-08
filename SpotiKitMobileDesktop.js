@@ -3,7 +3,7 @@
 // @namespace    https://github.com/kitbodega/SpotiKit
 // @version      7.3
 // @description  SpotiKit — Mobile‑like layout for Spotify Web. Floating player, bottom nav, library overlay, and more.
-// @author       kit_fogos
+// @author       kitbodega
 // @match        https://open.spotify.com/*
 // @match        https://www.spotify.com/*/account/*
 // @match        https://www.spotify.com/*/premium/*
@@ -13,11 +13,12 @@
 // @match        https://payments.spotify.com/*
 // @grant        GM_addStyle
 // @run-at       document-idle
-// @downloadURL https://raw.githubusercontent.com/kitbodega/SpotiKit/main/SpotiKit.user.js
-// @updateURL   https://raw.githubusercontent.com/kitbodega/SpotiKit/main/SpotiKit.user.js
+// @downloadURL https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.js
+// @updateURL   https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.js
 // @supportURL  https://github.com/kitbodega/SpotiKit/issues
 // @icon        https://i.ibb.co/YF1nLPfK/2eca7229-ca6a-4ad6-8653-b80a6a0f8586.png
 // ==/UserScript==
+// Ad blocking adapted from Spotifuck — https://github.com/Myst1cX/spotifuck-userscript
 
 (function() {
     'use strict';
@@ -957,41 +958,10 @@ ul.oPf3qKGRkUM3T0bK{
     }
 
     setTimeout(run, 300);
+    // Ad blocking adapted from Spotifuck (https://github.com/Myst1cX/spotifuck-userscript)
+    // Uses CSS-only approach: ad banners are hidden via injectMobileCSS()
+    // No audio/video manipulation — safe, non-breaking ad blocking
+
     setTimeout(run, 2000);
-
-    (function() {
-        const adSelectors = [
-            '[data-testid="ad-slot-container"]',
-            '[data-testid="ad-container"]',
-            '[data-testid="ad-slot"]',
-            '[class*="AdSlot"]',
-            '[class*="adunit"]',
-            '[class*="ad-container"]',
-            '[id*="ad-"]',
-            '[aria-label="Ad"]',
-            '[aria-label="Advertisement"]',
-        ];
-
-        const removeAds = () => {
-            adSelectors.forEach(sel => {
-                document.querySelectorAll(sel).forEach(el => el.remove());
-            });
-            const audioAd = document.querySelector('audio[src*="spotify.com/ad"], audio[src*="ad"]');
-            if (audioAd) {
-                audioAd.pause();
-                audioAd.src = '';
-                audioAd.remove();
-            }
-            document.querySelectorAll('video').forEach(v => {
-                if (v.src.includes('ad') || v.src.includes('spotify')) v.pause();
-            });
-
-        };
-
-        removeAds();
-        setInterval(removeAds, 2000);
-        new MutationObserver(removeAds).observe(document.body, { childList: true, subtree: true });
-
-    })();
 
 })();
