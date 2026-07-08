@@ -37,7 +37,7 @@
 // install link, premium menu link, Planes Premium/Premium Plans sweeps,
 // compact-banner rebuild, and the Try/Prueba button) so each is only
 // touched and logged once per element instead of re-firing on every tick.
-//
+
 // RESOLVED (7.2.fork, Myst1cX):
 // Added forceEnglish(), which overrides navigator.language/languages to
 // en-US and, on www.spotify.com, redirects non-English-region locale paths
