@@ -5,10 +5,11 @@ A JavaScript userscript that customizes the Spotify Web interface.
 ## Installation
 
 1. Install [Tampermonkey](https://www.tampermonkey.net/)[Violentmonkey](https://violentmonkey.github.io/).
-2. Click the raw link below — Tampermonkey/Violentmonkey will open the install dialog:
+2. Get [uSpot](https://github.com/Myst1cX/uSpot/releases/tag/2.0). [how do I install this extension in mobile?](https://github.com/Myst1cX/uSpot/#installation-on-a-mobile-device)
+3. Click the raw link below — Tampermonkey/Violentmonkey will open the install dialog:
    - **https://raw.githubusercontent.com/kitbodega/SpotiKit/main/SpotiKitMobileDesktop.user.js**
 3. Click **Install**.
-4. Go to [open.spotify.com](https://open.spotify.com) and reload.
+3. Go to [open.spotify.com](https://open.spotify.com) and reload.
 
 ## Features
 
@@ -34,11 +35,9 @@ A JavaScript userscript that customizes the Spotify Web interface.
 - Client-side JavaScript only. No Spotify servers are modified.
 - No account data is changed. Visual customization only.
 
-#Acknowledgments:
-
-* Special thanks to **[Myst1cX](https://github.com/Myst1cX)** for their excellent work on [this extension](https://www.reddit.com/c/chatwRCHSlWr/s/hi7uBRaaHr).(This is the one I highly recommend for spotikit) [how do I install this extension in mobile?](https://github.com/Myst1cX/uSpot/#installation-on-a-mobile-device)
-
 ## Ad-Blocking
+
+* Special thanks to **[Myst1cX](https://github.com/Myst1cX)** for their excellent work on [this extension](https://github.com/Myst1cX/uSpot/).(This is the one I highly recommend for spotikit)
 
 For ad-blocking, using the **[uBlock Origin](https://ublockorigin.com/)** browser extension instead of custom userscripts[cite: 1].
 ### Why use uBlock Origin?
