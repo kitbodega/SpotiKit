@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotiKit
 // @namespace    https://github.com/kitbodega/SpotiKit
-// @version      7.3
+// @version      7.3.fork
 // @description  SpotiKit — Mobile‑like layout for Spotify Web. Floating player, bottom nav, library overlay, and more.
 // @author       kitbodega
 // @match        https://open.spotify.com/*
@@ -19,6 +19,9 @@
 // @downloadURL  https://raw.githubusercontent.com/Myst1cX/SpotiKit/main/SpotiKitMobileDesktop.user.js
 // @icon         https://i.ibb.co/YF1nLPfK/2eca7229-ca6a-4ad6-8653-b80a6a0f8586.png
 // ==/UserScript==
+
+// RESOLVED (7.3.fork, Myst1cX):
+// Added proper linking for installing the script via an userscript manager 
 
 (function() {
     'use strict';
