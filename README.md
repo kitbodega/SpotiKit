@@ -34,7 +34,7 @@ A JavaScript userscript that customizes the Spotify Web interface.
 - Client-side JavaScript only. No Spotify servers are modified.
 - No account data is changed. Visual customization only.
 
-##Acknowledgments:
+#Acknowledgments:
 
 * Special thanks to **[Myst1cX](https://github.com/Myst1cX)** for their excellent work on [this extension](https://www.reddit.com/c/chatwRCHSlWr/s/hi7uBRaaHr)[cite: 1].(This is the one I highly recommend for spotikit) [how do I install this extension in mobile?](https://github.com/Myst1cX/uSpot/#installation-on-a-mobile-device)
 
