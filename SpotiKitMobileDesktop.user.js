@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         SpotiKit
 // @namespace    https://github.com/kitbodega/SpotiKit
-// @version      7.3.fork
+// @version      7.3
 // @description  SpotiKit — Mobile‑like layout for Spotify Web. Floating player, bottom nav, library overlay, and more.
 // @author       kitbodega
+// @icon         https://i.ibb.co/YF1nLPfK/2eca7229-ca6a-4ad6-8653-b80a6a0f8586.png
 // @match        https://open.spotify.com/*
 // @match        https://www.spotify.com/*/account/*
 // @match        https://www.spotify.com/*/premium/*
@@ -12,16 +13,12 @@
 // @match        https://www.spotify.com/*/family/*
 // @match        https://payments.spotify.com/*
 // @grant        GM_addStyle
-// @run-at       document-idle
-// @homepageURL  https://github.com/Myst1cX/SpotiKit
-// @supportURL   https://github.com/Myst1cX/SpotiKit/issues
-// @updateURL    https://raw.githubusercontent.com/Myst1cX/SpotiKit/main/SpotiKitMobileDesktop.user.js
-// @downloadURL  https://raw.githubusercontent.com/Myst1cX/SpotiKit/main/SpotiKitMobileDesktop.user.js
-// @icon         https://i.ibb.co/YF1nLPfK/2eca7229-ca6a-4ad6-8653-b80a6a0f8586.png
+// @run-at       document-start
+// @homepageURL  https://github.com/kitbodega/SpotiKit
+// @supportURL   https://github.com/kitbodega/SpotiKit/issues
+// @updateURL   https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.user.js
+// @downloadURL https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.user.js
 // ==/UserScript==
-
-// RESOLVED (7.3.fork, Myst1cX):
-// Added proper linking for installing the script via an userscript manager 
 
 (function() {
     'use strict';
@@ -924,7 +921,7 @@ ul.oPf3qKGRkUM3T0bK{
             left.appendChild(leftText);
             left.onclick = e => {
                 e.stopPropagation();
-                window.location.href = 'https://www.spotify.com/mx/account/profile/';
+                window.location.href = 'https://www.spotify.com/us/account/profile/';
             };
 
             const right = document.createElement('div');
@@ -943,7 +940,7 @@ ul.oPf3qKGRkUM3T0bK{
             right.appendChild(rightText);
             right.onclick = e => {
                 e.stopPropagation();
-                window.location.href = 'https://www.spotify.com/mx/account/saved-payment-cards/';
+                window.location.href = 'https://www.spotify.com/us/account/saved-payment-cards/';
             };
 
             premiumBanner.innerHTML = '';
@@ -963,43 +960,5 @@ ul.oPf3qKGRkUM3T0bK{
     setTimeout(run, 300);
     setTimeout(run, 2000);
 
-    // Ad blocking — adapted from Spotify AdBlocker by Plancy
-    const removeAdElements = () => {
-        document.querySelectorAll('[data-testid="ad-slot-container"], [class*="ad-"]').forEach(el => el.remove());
-        const audioAd = document.querySelector('audio[src*="spotify.com/ad"]');
-        if (audioAd) {
-            audioAd.src = "";
-            audioAd.pause();
-        }
-    };
-
-    const adObserver = new MutationObserver(removeAdElements);
-    adObserver.observe(document.body, { childList: true, subtree: true });
-    setInterval(removeAdElements, 1000);
-
-    // Skip ads via player state
-    setInterval(() => {
-        let isAd = false;
-
-        try {
-            const state = window.sp?.player?._state || window.Spotify?.Player?._state;
-            const track = state?.track || state?.item;
-            if (track && track.id === "Spotify-Advertisement") {
-                isAd = true;
-            }
-        } catch (e) {}
-
-        if (!isAd) {
-            const artistEl = document.querySelector('[data-testid="context-item-info-artist"]');
-            if (artistEl && artistEl.textContent.trim() === 'Advertisement') {
-                isAd = true;
-            }
-        }
-
-        if (isAd) {
-            const nextBtn = document.querySelector('button[data-testid="control-button-skip-forward"]');
-            if (nextBtn) nextBtn.click();
-        }
-    }, 500);
 
 })();
