@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SpotiKit++ desktop
 // @namespace    https://github.com/kitbodega/SpotiKit
-// @version      7.1.fork
+// @version      7.2.fork
 // @description  SpotiKit — visual premium UI overlay for Spotify and ad banner blocking
 // @author       kit_fogos
 // @match        https://www.spotify.com/*/account/*
@@ -37,6 +37,18 @@
 // install link, premium menu link, Planes Premium/Premium Plans sweeps,
 // compact-banner rebuild, and the Try/Prueba button) so each is only
 // touched and logged once per element instead of re-firing on every tick.
+//
+// RESOLVED (7.2.fork):
+// Added forceEnglish(), which overrides navigator.language/languages to
+// en-US and, on www.spotify.com, redirects non-English-region locale paths
+// (e.g. /mx/, /es/) to /us/ so the page itself loads in English instead of
+// relying on text-replacement afterward. Runs once on script start.
+// Since the site now always renders in English, dropped the Spanish
+// alternatives from the button/table/XPath matchers (obtener, conseguir,
+// explorar, ver, prueba, gratuito, "Planes Premium") and the Spanish
+// "Descarga canciones..." string check — they're dead weight now.
+// Updated the two hardcoded account-page redirect URLs from /mx/ to /us/
+// to match.
 
 (function() {
     'use strict';
@@ -117,6 +129,28 @@
         while (n = w.nextNode()) applyReplacements(n);
     }
 
+    // Ported from Spotifuck's ForceEn (Android forces the app locale to
+    // English before loading its WebView). There's no app Configuration to
+    // set here, so the browser-side equivalent is: spoof navigator's
+    // reported language, and — on www.spotify.com, where locale is a path
+    // segment (e.g. /mx/, /es/) — redirect off any non-English region so
+    // the page itself renders in English rather than relying on the
+    // find-and-replace pass to catch up after the fact.
+    function forceEnglish() {
+        try {
+            Object.defineProperty(navigator, 'language', { get: () => 'en-US', configurable: true });
+            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'], configurable: true });
+        } catch (e) {}
+
+        if (location.hostname === 'www.spotify.com') {
+            const ENGLISH_REGIONS = ['us', 'gb', 'ca', 'au', 'ie', 'nz'];
+            const m = location.pathname.match(/^\/([a-z]{2})(\/.*)?$/i);
+            if (m && !ENGLISH_REGIONS.includes(m[1].toLowerCase())) {
+                location.replace(location.origin + '/us' + (m[2] || '/') + location.search + location.hash);
+            }
+        }
+    }
+
     function run() {
         const b = document.body;
         if (!b) return;
@@ -161,19 +195,19 @@
         document.querySelectorAll('a, button, [role="button"]').forEach(el => {
             const orig = (el.innerText || el.textContent || '').trim();
             const t = orig.toLowerCase();
-            if (/^(get|buy|join|obtener|conseguir)\s*premium/.test(t)) {
+            if (/^(get|buy|join)\s*premium/.test(t)) {
                 logChange('a, button, [role="button"]', orig, 'DONT JOIN PREMIUM');
                 el.textContent = 'DONT JOIN PREMIUM';
                 el.style.cssText += `background:${PINK}!important;color:#000!important;border:none!important;border-radius:20px!important;font-weight:700!important;pointer-events:none!important;cursor:default!important;`;
                 el.onclick = e => { e.preventDefault(); e.stopPropagation(); };
             }
-            if (/^(explore|view|explorar|ver)\s*(plans|planes)/.test(t)) {
+            if (/^(explore|view)\s*plans/.test(t)) {
                 logChange('a, button, [role="button"]', orig, 'Manage plan');
                 el.textContent = 'Manage plan';
                 el.style.cssText += `background:transparent!important;color:#fff!important;border:1px solid #727272!important;border-radius:20px!important;font-weight:700!important;pointer-events:none!important;cursor:default!important;`;
                 el.onclick = e => { e.preventDefault(); e.stopPropagation(); };
             }
-            if (/^(try|pru[eé]ba)/.test(t) && !el.dataset.spDone) {
+            if (/^try/.test(t) && !el.dataset.spDone) {
                 logChange('a, button, [role="button"]', orig, '(hidden)');
                 el.style.display = 'none';
                 el.dataset.spDone = '1';
@@ -192,7 +226,7 @@
         document.querySelectorAll('table').forEach(tbl => {
             tbl.querySelectorAll('td, th').forEach(cell => {
                 const t = cell.textContent.trim().toLowerCase();
-                if (!t || t === '—' || t === '-' || t === 'no' || /gratuito|free/.test(t)) {
+                if (!t || t === '—' || t === '-' || t === 'no' || /free/.test(t)) {
                     logChange('table td, th', t || '(empty)', '✓');
                     cell.innerHTML = `<span style="color:${GREEN};font-weight:700;">✓</span>`;
                 }
@@ -201,7 +235,7 @@
 
         document.querySelectorAll('span[data-encore-id="text"]').forEach(el => {
             const t = el.textContent.trim();
-            if (t === 'Download for offline listening' || t === 'Descarga canciones para disfrutarlas sin conexi\u00f3n' || t === 'Descarga canciones para disfrutarlas sin conexión') {
+            if (t === 'Download for offline listening') {
                 logChange('span[data-encore-id="text"]', t, 'Spotify wont fuck you');
                 el.textContent = 'Spotify wont fuck you';
             }
@@ -215,22 +249,22 @@
         if (premiumMenu) { logChange('a[href*="premium/?ref=web_loggedin_upgrade_menu"]', premiumMenu.textContent.trim(), '(hidden)'); premiumMenu.style.display = 'none'; premiumMenu.dataset.spDone = '1'; }
 
         const planesXpath = document.evaluate(
-            '//a[text()="Planes Premium"] | //span[text()="Planes Premium"] | //div[text()="Planes Premium"] | //a[text()="Premium Plans"] | //span[text()="Premium Plans"] | //div[text()="Premium Plans"]',
+            '//a[text()="Premium Plans"] | //span[text()="Premium Plans"] | //div[text()="Premium Plans"]',
             document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null
         );
         for (let i = 0; i < planesXpath.snapshotLength; i++) {
             const n = planesXpath.snapshotItem(i);
             if (n && n.nodeType === 1 && !n.dataset.spDone) {
-                logChange('(xpath) Planes Premium / Premium Plans text', n.textContent.trim(), '(hidden)');
+                logChange('(xpath) Premium Plans text', n.textContent.trim(), '(hidden)');
                 n.style.display = 'none';
                 n.dataset.spDone = '1';
             }
         }
 
-        document.querySelectorAll('[aria-label*="Planes Premium"], [aria-label*="Premium Plans"], [data-ga-action="premium"], [data-ga-category="menu"] a, a[href*="/premium/"]').forEach(el => {
+        document.querySelectorAll('[aria-label*="Premium Plans"], [data-ga-action="premium"], [data-ga-category="menu"] a, a[href*="/premium/"]').forEach(el => {
             if (el.dataset.spDone) return;
             const t = el.textContent.trim();
-            if (t === 'Planes Premium' || t === 'Premium Plans') {
+            if (t === 'Premium Plans') {
                 logChange('[aria-label*="Premium Plans"] / [data-ga-action="premium"] / a[href*="/premium/"]', t, '(hidden)');
                 el.style.display = 'none';
                 el.dataset.spDone = '1';
@@ -276,7 +310,7 @@
             left.appendChild(leftText);
             left.onclick = e => {
                 e.stopPropagation();
-                window.location.href = 'https://www.spotify.com/mx/account/profile/';
+                window.location.href = 'https://www.spotify.com/us/account/profile/';
             };
 
             
@@ -296,7 +330,7 @@
             right.appendChild(rightText);
             right.onclick = e => {
                 e.stopPropagation();
-                window.location.href = 'https://www.spotify.com/mx/account/saved-payment-cards/';
+                window.location.href = 'https://www.spotify.com/us/account/saved-payment-cards/';
             };
 
 
@@ -337,6 +371,8 @@
             });
         }
     }
+
+    forceEnglish();
 
     setTimeout(() => { scanText(document.body); run(); }, 300);
     setTimeout(() => { scanText(document.body); run(); }, 1200);
