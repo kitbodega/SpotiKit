@@ -16,8 +16,8 @@
 // @run-at       document-start
 // @homepageURL  https://github.com/kitbodega/SpotiKit
 // @supportURL   https://github.com/kitbodega/SpotiKit/issues
-// @updateURL    https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.js
-// @downloadURL  https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.js
+// @updateURL   https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.user.js
+// @downloadURL https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.user.js
 // ==/UserScript==
 
 (function() {
