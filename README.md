@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/29791661/README.md)
 # SpotiKit
 
 A JavaScript userscript that customizes the Spotify Web interface.
@@ -38,10 +37,6 @@ A JavaScript userscript that customizes the Spotify Web interface.
 - Client-side JavaScript only. No Spotify servers are modified.
 - No account data is changed. Visual customization only.
 - Requires Tampermonkey or compatible userscript manager.
-
-## Repo
-
-https://github.com/kitbodega/SpotiKit
 
 ## License
 
