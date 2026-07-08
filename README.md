@@ -1,67 +1,48 @@
+[README.md](https://github.com/user-attachments/files/29791661/README.md)
 # SpotiKit
 
 A JavaScript userscript that customizes the Spotify Web interface.
 
-## Features
-
-### Desktop (`open.spotify.com`)
-- Ad blocking (ads, banners, download prompts)
-- Hide Premium pages and payment pages
-
-### Mobile web player (`open.spotify.com` in responsive view on PC)
-- Hide floating tooltips (`[data-tippy-root]`)
-- Hide mobile upsells (`[data-testid="mobile-upsell"]`)
-- Hide OneTrust consent dialog (`#onetrust-consent-sdk`)
-- Library tab redirect — intercepts bottom navigation "Library" tab and redirects to `/collection/tracks`
-- Prevent library context menu (`data-context-menu-open`) from appearing on Library tab
-- UI spoticap (desktop force)
-
-### Account pages (`spotify.com/account/*`, payments, etc.)
-- Text replacements (e.g. "Spotify Free" → "Premium Individual", "Shuffle play" → "Play any song", etc.)
-- Pink Premium branding on plan cards
-- Premium page blocker — replaces premium/duo/student/family pages with a "you don't need Premium" message
-- Payment page blocker — replaces payments.spotify.com with a "don't waste your money" message
-- Disable payment forms and checkout buttons
-- Hide download/install app prompts
-- Hide "Open in Desktop App" elements
-- Hide Premium navigation links
-
-# SpotiKit++ Mobile Desktop 7.1
-
-A Tampermonkey userscript that transforms [open.spotify.com](https://open.spotify.com) into a **mobile**-style interface on your desktop. It includes a bottom navigation bar, a library overlay, a compact player, a Premium spoof, and ad blocking.
-
----
-
 ## Installation
 
-1. Install [Tampermonkey](https://www.tampermonkey.net/) in your browser (Chrome, Edge, Firefox, Opera).
-2. Click on [`SpotiKitMobileDesktop.js`](SpotiKitMobileDesktop.js) and then on **Raw** (or copy the content manually).
-3. Tampermonkey will open the installation page → click **Install**.
-4. Go to [open.spotify.com](https://open.spotify.com) and reload the page.
+1. Install [Tampermonkey](https://www.tampermonkey.net/) (Chrome, Edge, Firefox, Opera).
+2. Click the raw link below — Tampermonkey will open the install dialog:
+   - **https://raw.githubusercontent.com/kitbodega/SpotiKit/main/SpotiKitMobileDesktop.js**
+3. Click **Install**.
+4. Go to [open.spotify.com](https://open.spotify.com) and reload.
 
 ## Features
 
-### Mobile Interface
-- **Bottom navigation bar** with Home, Search, and Library tabs.
-- **Library** as a full-screen overlay (with no visible sidebar).
-- **Compact player** with album art, like, skip, and play/pause buttons.
-- Thin progress bar at the top edge of the player.
-- Home button hidden in Search and Library.
+### Mobile-like Desktop UI (`open.spotify.com`)
+- **Floating player** with glassmorphism (blur, border, rounded corners) and minimize toggle button
+- **Transparent bottom navigation bar** with Home, Search, and Library tabs
+- **Library as full-screen overlay** (no persistent sidebar)
+- **Home button always visible** with filled SVG icon
+- **Search input hidden globally**, shown only on Search page
+- **Right sidebar (Now Playing) visible** but selectively collapsed — hides close button, artist bio, and credits; keeps the **queue list** visible
+- **Auto-closes Now Playing panel** when it opens on song play (MutationObserver)
+- Official Spotify SVGs extracted from the DOM for the bottom nav icons
+- Ad blocking (banners, download prompts, upsells)
+- Hide Premium upgrade buttons, fullscreen mode button, tooltips, mobile upsells, consent dialogs
 
-
-### Mobile DOM Hacks
-- Synchronization with the sidebar (sidebar toggle without conflicts with React).
-- Automatic closing of the playback panel when navigating.
-- Extraction of official Spotify SVGs from the DOM.
-
+### Premium Spoof & Page Blockers (`spotify.com/account/*`, payments, etc.)
+- Text replacements (e.g. "Spotify Free" → "Premium Individual", "Shuffle play" → "Play any song")
+- Pink Premium branding on plan cards
+- Premium/duo/student/family pages blocked — replaced with "you don't need Premium" message
+- Payment page blocker — replaces `payments.spotify.com` with "don't waste your money" message
+- Disable payment forms and checkout buttons
+- Hide download/install app prompts, "Open in Desktop App" elements, and Premium navigation links
 
 ## Notes
 
-- Client-side JavaScript only.
-- No Spotify servers are modified.
-- No account data is changed.
-- Visual customization only.
+- Client-side JavaScript only. No Spotify servers are modified.
+- No account data is changed. Visual customization only.
+- Requires Tampermonkey or compatible userscript manager.
+
+## Repo
+
+https://github.com/kitbodega/SpotiKit
 
 ## License
 
-MIT License
+MIT
