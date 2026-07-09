@@ -41,5 +41,6 @@ This extension's AD_URL_PATTERNS array is these same domains, translated into we
 2. The replacement file
 noop-1s.mp4 is taken from uBlock Origin's github https://github.com/gorhill/uBlock/blob/master/src/web_accessible_resources/noop-1s.mp4
 
-#LICENSE
+## License
+
 MIT
