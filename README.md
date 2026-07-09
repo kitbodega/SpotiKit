@@ -34,9 +34,8 @@ Removed from mobile; use the [Myst1cX fork](https://github.com/Myst1cX/SpotiKit)
 
 For ad-blocking, using the **[uBlock Origin](https://ublockorigin.com/)** browser extension instead of custom userscripts[cite: 1].
 ### Why use uBlock Origin?
-* **Reliability:** uBlock Origin uses the `webRequest` API to intercept and replace ad requests with silent placeholders (e.g., 1-second clips), ensuring a seamless listening experience without playback errors[cite: 1].
-* **Maintenance:** Ad-blocking filters require constant updates due to changes on Spotify's side. The uBlock Origin team is best positioned to monitor and push these updates immediately[cite: 1].
-* **Performance:** Relying on DOM-based hiding or silencing techniques is inefficient and can lead to playback issues or forced waits during ad intervals. Using a dedicated extension ensures the script remains lightweight and focused on UI customization[cite: 1].
+* **Reliability:** uBlock Origin uses the `webRequest` API to intercept and replace ad requests with silent placeholders (e.g., 1-second clips), ensuring a seamless listening experience without playback errors
+* **Maintenance:** Ad-blocking filters require constant updates due to changes on Spotify's side. The uBlock Origin team is best positioned to monitor and push these updates immediately.
 ## License
 
 MIT
