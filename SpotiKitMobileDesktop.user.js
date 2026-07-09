@@ -15,7 +15,7 @@
 // ==/UserScript==
 
 // RESOLVED (7.3.1.fork, Myst1cX):
-// Added a browser-side equivaent of Spotifuck's ForceEnglish
+// Added a browser-side equivalent of Spotifuck's ForceEnglish
 // The userscript version forces English on open.spotify.com by overriding navigator.language/languages, 
 // stripping a non-English /intl-xx/ locale prefix from the URL if present, 
 // and flipping the account-level language setting at open.spotify.com/preferences to English via a hidden iframe when needed, 
