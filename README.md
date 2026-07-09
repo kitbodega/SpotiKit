@@ -21,7 +21,7 @@ A JavaScript userscript that customizes the Spotify Web interface.
 
 
 ## Premium Spoof fake & Page Blockers:
-Removed from mobile; use the [Myst1cX fork](https://github.com/Myst1cX/SpotiKit)
+Removed from mobile; use the [Myst1cX fork](https://github.com/Myst1cX/SpotiKit) Desktop only.
 
 ## Notes
 
