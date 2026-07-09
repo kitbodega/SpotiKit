@@ -31,11 +31,8 @@ Removed from mobile; use the [Myst1cX fork](https://github.com/Myst1cX/SpotiKit)
 ## Ad-Blocking
 
 * Special thanks to **[Myst1cX](https://github.com/Myst1cX)** for their excellent work on [this extension](https://github.com/Myst1cX/uSpot/).(This is the one I highly recommend for spotikit)
+  
+Essentially uSpot does same as ublock, it uses ublock's 1 second placeholder too. so there's virtually no difference except for the maintenance part as you mentioned there and ublock being generally an adblock for all whereas uspot is spotify only, and focused on ad audio only (not including ad banners, or get premium buttons etc - things that ublock can get rid of with cosmetic filter)
 
-For ad-blocking, using the **[uBlock Origin](https://ublockorigin.com/)** browser extension instead of custom userscripts[cite: 1].
-### Why use uBlock Origin?
-* **Reliability:** uBlock Origin uses the `webRequest` API to intercept and replace ad requests with silent placeholders (e.g., 1-second clips), ensuring a seamless listening experience without playback errors
-* **Maintenance:** Ad-blocking filters require constant updates due to changes on Spotify's side. The uBlock Origin team is best positioned to monitor and push these updates immediately.
-## License
-
+#LICENSE
 MIT
