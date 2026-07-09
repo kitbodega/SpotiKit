@@ -35,12 +35,7 @@ Removed from mobile; use the [Myst1cX fork](https://github.com/Myst1cX/SpotiKit)
 Essentially uSpot does same as ublock, it uses ublock's 1 second placeholder too. so there's virtually no difference except for the maintenance part as you mentioned there and ublock being generally an adblock for all whereas uspot is spotify only, and focused on ad audio only (not including ad banners, or get premium buttons etc - things that ublock can get rid of with cosmetic filter)
 
 1. The ad-blocking rules
-The domains/paths in AD_URL_PATTERNS (background.js) are copied from uBlock Origin's own bundled filter list, assets/ublock/filters.min.txt, which contains these rules for open.spotify.com:
-||scdn.co/audio/$media,redirect=noop-1s.mp4:10,domain=open.spotify.com
-||scdn.co/mp3-ad/$media,redirect=noop-1s.mp4:10,domain=open.spotify.com
-||scdn.co/mp3/$media,redirect=noop-1s.mp4:10,domain=open.spotify.com
-||spotifycdn.com/audio/$media,redirect=noop-1s.mp4:10,domain=open.spotify.com
-||adstudio-assets.scdn.co^$media,redirect=noop-1s.mp4:10,domain=open.spotify.com
+The domains/paths in AD_URL_PATTERNS (background.js) are copied from uBlock Origin's own bundled filter list, assets/ublock/filters.min.txt, which contains these rules for open.spotify.com
 This extension's AD_URL_PATTERNS array is these same domains, translated into webRequest match-pattern syntax.
 
 2. The replacement file
