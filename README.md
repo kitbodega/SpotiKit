@@ -15,20 +15,13 @@ A JavaScript userscript that customizes the Spotify Web interface.
 
 ### Mobile-like Desktop UI (`open.spotify.com`)
 - **Floating player** with glassmorphism (blur, border, rounded corners) and minimize toggle button
-- **Transparent bottom navigation bar** with Home, Search, and Library tabs
-- **Library as full-screen overlay** (no persistent sidebar)
+- **Tabs navigation bar** Home, Search, and Library tabs
+- **Library as full-screen overlay** (no persistent sidebar I think the library is broken.)
 - **Search input hidden globally**, shown only on Search page
-- **Right sidebar (Now Playing) visible** but selectively collapsed — hides close button, artist bio, and credits; keeps the **queue list** visible
-- **Auto-closes Now Playing panel** when it opens on song play (MutationObserver)
-- Official Spotify SVGs extracted from the DOM for the bottom nav icons
 
-### Premium Spoof fake & Page Blockers (`spotify.com/account/*`, payments, etc.)
-- Text replacements (e.g. "Spotify Free" → "Premium Individual", "Shuffle play" → "Play any song")
-- Pink Premium branding on plan cards
-- Premium/duo/student/family pages blocked — replaced with "you don't need Premium" message
-- Payment page blocker — replaces `payments.spotify.com` with "don't waste your money" message
-- Disable payment forms and checkout buttons
-- Hide download/install app prompts, "Open in Desktop App" elements, and Premium navigation links
+
+## Premium Spoof fake & Page Blockers:
+Removed from mobile; use the [Myst1cX fork](https://github.com/Myst1cX/SpotiKit)
 
 ## Notes
 
