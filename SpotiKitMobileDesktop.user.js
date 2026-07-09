@@ -1,21 +1,190 @@
 // ==UserScript==
 // @name         SpotiKit
 // @namespace    https://github.com/kitbodega/SpotiKit
-// @version      7.3.1
+// @version      7.3.1.fork
 // @description  SpotiKit — Mobile‑like layout for Spotify Web. Floating player, bottom nav, library overlay, and more.
 // @author       kitbodega
 // @icon         https://i.ibb.co/YF1nLPfK/2eca7229-ca6a-4ad6-8653-b80a6a0f8586.png
 // @match        https://open.spotify.com/*
 // @grant        GM_addStyle
 // @run-at       document-start
-// @homepageURL  https://github.com/kitbodega/SpotiKit
-// @supportURL   https://github.com/kitbodega/SpotiKit/issues
-// @updateURL   https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.user.js
-// @downloadURL https://raw.githubusercontent.com/kitbodega/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.user.js
+// @homepageURL  https://github.com/Myst1cX/SpotiKit
+// @supportURL   https://github.com/Myst1cX/SpotiKit/issues
+// @updateURL   https://raw.githubusercontent.com/Myst1cX/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.user.js
+// @downloadURL https://raw.githubusercontent.com/Myst1cX/SpotiKit/refs/heads/main/SpotiKitMobileDesktop.user.js
 // ==/UserScript==
+
+// RESOLVED (7.3.1.fork, Myst1cX):
+// Added a browser-side equivaent of Spotifuck's ForceEnglish
+// The userscript version forces English on open.spotify.com by overriding navigator.language/languages, 
+// stripping a non-English /intl-xx/ locale prefix from the URL if present, 
+// and flipping the account-level language setting at open.spotify.com/preferences to English via a hidden iframe when needed, 
+// then verifying it stuck before reloading the page automatically.
 
 (function() {
     'use strict';
+
+    function forceEnglish() {
+        try {
+            Object.defineProperty(navigator, 'language', { get: () => 'en-US', configurable: true });
+            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'], configurable: true });
+        } catch (e) {}
+
+        const m = location.pathname.match(/^\/intl-([a-z]{2})(\/.*)?$/i);
+        if (m && m[1].toLowerCase() !== 'en') {
+            location.replace(location.origin + (m[2] || '/') + location.search + location.hash);
+            return;
+        }
+
+        forceEnglishAccountSetting();
+    }
+
+    function forceEnglishAccountSetting() {
+        const PENDING_KEY = 'spotikitEnglishFlipPending';
+        const ATTEMPTS_KEY = 'spotikitEnglishFlipAttempts';
+        const MAX_ATTEMPTS = 3;
+
+        if (window.top !== window.self) return;
+
+        const verifying = localStorage.getItem(PENDING_KEY) === 'true';
+        if (verifying) localStorage.removeItem(PENDING_KEY);
+
+        const withPreferencesDoc = (callback) => {
+            let settled = false;
+            const fire = (doc, cleanup) => {
+                if (settled) return;
+                settled = true;
+                callback(doc, cleanup);
+            };
+
+            if (location.pathname.startsWith('/preferences')) {
+                fire(document, () => {});
+                return;
+            }
+
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'https://open.spotify.com/preferences';
+            (document.documentElement || document.body).appendChild(iframe);
+
+            let removed = false;
+            const cleanup = () => {
+                if (removed) return;
+                removed = true;
+                iframe.remove();
+            };
+
+            iframe.addEventListener('load', () => {
+                try {
+                    fire(iframe.contentDocument, cleanup);
+                } catch (e) {
+                    cleanup();
+                    fire(null, cleanup);
+                }
+            });
+
+            setTimeout(() => { cleanup(); fire(null, cleanup); }, 15000);
+        };
+
+        const giveUp = () => {};
+
+        const attemptFlip = () => {
+            withPreferencesDoc((doc, cleanup) => {
+                if (!doc) { cleanup(); giveUp(); return; }
+                applyEnglishToLanguageSelect(doc, (result) => {
+                    if (!result.found) {
+                        cleanup();
+                        giveUp();
+                        return;
+                    }
+                    if (!result.changed) {
+                        cleanup();
+                        localStorage.removeItem(ATTEMPTS_KEY);
+                        return;
+                    }
+                    localStorage.setItem(PENDING_KEY, 'true');
+                    setTimeout(() => { cleanup(); location.reload(); }, 1000);
+                });
+            });
+        };
+
+        if (!verifying) {
+            attemptFlip();
+            return;
+        }
+
+        withPreferencesDoc((doc, cleanup) => {
+            if (!doc) { cleanup(); giveUp(); return; }
+            applyEnglishToLanguageSelect(doc, (result) => {
+                cleanup();
+                if (result.found && result.value === 'en') {
+                    localStorage.removeItem(ATTEMPTS_KEY);
+                    return;
+                }
+                if (!result.found) {
+                    giveUp();
+                    return;
+                }
+                const attempts = parseInt(localStorage.getItem(ATTEMPTS_KEY) || '0', 10) + 1;
+                if (attempts >= MAX_ATTEMPTS) {
+                    giveUp();
+                    return;
+                }
+                localStorage.setItem(ATTEMPTS_KEY, String(attempts));
+                attemptFlip();
+            }, { readOnly: true });
+        });
+    }
+
+    function applyEnglishToLanguageSelect(doc, onDone, { readOnly = false } = {}) {
+        let settled = false;
+        const resolve = (result) => {
+            if (settled) return;
+            settled = true;
+            onDone(result);
+        };
+
+        const trySelect = () => {
+            const select = doc.getElementById('desktop.settings.selectLanguage');
+            if (!select) return false;
+
+            if (readOnly || select.value === 'en') {
+                resolve({ found: true, value: select.value, changed: false });
+                return true;
+            }
+
+            const win = doc.defaultView || window;
+            const nativeSetter = Object.getOwnPropertyDescriptor(win.HTMLSelectElement.prototype, 'value').set;
+            nativeSetter.call(select, 'en');
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+
+            resolve({ found: true, value: 'en', changed: true });
+            return true;
+        };
+
+        if (trySelect()) return;
+
+        const win = doc.defaultView || window;
+        const startObserving = () => {
+            if (trySelect()) return;
+            const observer = new win.MutationObserver(() => {
+                if (trySelect()) observer.disconnect();
+            });
+            observer.observe(doc.body, { childList: true, subtree: true });
+            setTimeout(() => {
+                observer.disconnect();
+                resolve({ found: false, value: null, changed: false });
+            }, 12000);
+        };
+
+        if (doc.body) {
+            startObserving();
+        } else {
+            doc.addEventListener('DOMContentLoaded', startObserving, { once: true });
+        }
+    }
+
+    forceEnglish();
 
     let ulFlag = false;
     let ffDone = false;
