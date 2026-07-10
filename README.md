@@ -4,6 +4,6 @@
 
 I'll take care of updating the UI and fixing it. Thank you very much, Myst1cX!
 
-https://github.com/Myst1cX/SpotiKit
+The latest version of SpotiwebJS is in the Myst1cX repository. For now, this js will never be updated. [here.] (https://github.com/Myst1cX/SpotiKit/blob/main/SpotiwebJS.user.js)
 
 
